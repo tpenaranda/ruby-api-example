@@ -25,7 +25,6 @@ class ApiSupport < Roda; end
 require 'config/mail'
 require 'config/sequel'
 require 'config/hanami'
-require 'config/sidekiq'
 require 'config/rack'
 require 'config/grape'
 
@@ -43,8 +42,6 @@ Dir['./application/models/*.rb'].each { |rb| require rb }
 
 Dir['./application/api_helpers/**/*.rb'].each { |rb| require rb }
 class Api < Grape::API
-  use ApiLogger
-
   version 'v1.0', using: :path
   content_type :json, 'application/json'
   default_format :json

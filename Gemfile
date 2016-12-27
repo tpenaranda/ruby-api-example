@@ -1,6 +1,6 @@
 ruby '2.3.3'
 
-source 'https://rubygems.org'
+source 'http://rubygems.org'
 
 # include sidekiq for background processing
 gem 'sidekiq', '4.2.7'
