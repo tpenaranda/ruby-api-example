@@ -4,11 +4,19 @@
 
 You will be creating a simple user management API using the tools described below. Already provided is a very basic ruby application which you will need to build the following endpoints for:
 
-1. POST /users - Create a new user. It should accept the following fields: first name, last name, email, password, date of birth. Upon successful creation it should send an email to their address confirming the new account using the Roda mail plugin (see Roda plugins in the link below)
-2. PUT /users/:id - Update a user. Add authentication so only the current user can update their own account. There is already a user ability created for this (see applicationlib/abilities.rb).
-3. PATCH /users/:id/reset_password - Update a user password. It should accept the following fields: new password. It should also send them an email letting them know their password has been updated.
+### Features that you need to implement
+1. POST /users - Create a new user. It should accept the following fields: first name, last name, email, password, date of birth.  Date of Birth is the only optional field. Upon successful creation it should send an email to their address confirming the new account (add the mail gem or any other mailer you prefer)
+2. PUT /users/:id - Update a user. Add authentication so only the current user can update their own account. There is already a user ability created for this (see `application/lib/abilities.rb`).
+3. PATCH /users/:id/reset_password - Update a user password. It should accept the following fields: new_password, confirm_password. It should also send them an email letting them know their password has been updated.
 
-All endpoints should have their input and response formats defined using Grape Entities (see URL for library below). Input data should be validated using Hanami forms.
+### Coding Guidelines for each Features
+1. All endpoints should have their input and response formats defined using Grape Entities (see URL for library below).
+2. Input data should be validated using Hanami forms.
+3. Each feature must have a spec testing different scenarios and possible failures.  Check that the data is being returned properly.
+4. Use grape-swagger to automatically generate swagger docs.
+5. Use background processing where applicable, like mailers (ie. Sidekiq gem).  Make sure to have independent spec tests for these jobs.
+6. Come up with your own authentication pattern in `application/api_helpers/auth.rb`  (examples include: ruby-jwt, generic oauth, signature headers)
+
 
 ## Installation Process:
 
@@ -22,7 +30,7 @@ All endpoints should have their input and response formats defined using Grape E
 8. Enter correct env values for .env.development
 9. Repeat steps 7 and 8 for env.test
 10. To start ruby server, run `make run`
-11. Site will now be accessible at http://localhost:3000
+11. The API will now be accessible at http://localhost:3000/api/v1.0/users
 
 **Note:** Be sure to set database url for env.test to your test database and not your development database. Tests will truncate all tables in the test database before running!
 
@@ -35,8 +43,6 @@ Grape: https://github.com/ruby-grape/grape
 Grape Entity: https://github.com/ruby-grape/grape-entity
 
 Grape Swagger: https://github.com/ruby-grape/grape-swagger
-
-Roda: http://roda.jeremyevans.net/
 
 ### Database / Models
 
@@ -66,7 +72,7 @@ To apply the migration: `bundle exec rake db:migrate`
 
 To apply the migration to your test database: `RACK_ENV=test bundle exec rake db:migrate`
 
-## Testing
+## Running Tests
 
 Run your tests using:
 

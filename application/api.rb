@@ -12,20 +12,15 @@ end
 
 require 'bundler'
 Bundler.setup :default, RACK_ENV
-require 'roda'
 require 'rack/indifferent'
 require 'grape'
 require 'grape/batch'
-require 'nokogiri'
 # Initialize the application so we can add all our components to it
 class Api < Grape::API; end
-class ApiSupport < Roda; end
 
 # Include all config files
-require 'config/mail'
 require 'config/sequel'
 require 'config/hanami'
-require 'config/rack'
 require 'config/grape'
 
 # require some global libs
@@ -68,37 +63,4 @@ class Api < Grape::API
 
   add_swagger_documentation \
     mount_path: '/docs'
-end
-
-class ApiSupport < Roda
-  use Bugsnag::Rack if defined?(Bugsnag)
-
-  plugin :multi_route
-  plugin :all_verbs
-  plugin :mailer, content_type: 'text/html'
-  plugin :render, views: 'application/views',
-                  ext: 'html.erb'
-  plugin :partials
-  plugin :content_for
-
-  route do |r|
-    r.root do
-      'Nothing Here'
-    end
-
-    if RACK_ENV == 'development'
-      # Test interface to preview html templates like emails
-      # /static?layout=mailer-layout&view=/application/views/mailers/invitations/new_rep
-      r.get 'static' do
-        view_path = r['view'].split('/').delete_if(&:empty?)
-        template = view_path[-1]
-        path = view_path.slice(0..-2).join('/')
-        view(template, layout: r['layout'], views: path)
-      end
-    end
-
-    r.multi_route
-  end
-
-  Dir['./application/mailers/**/*.rb'].each { |rb| require rb }
 end

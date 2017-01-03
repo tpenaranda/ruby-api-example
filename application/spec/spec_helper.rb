@@ -16,10 +16,6 @@ class Sequel::Model
   alias_method :save!, :save
 end
 
-Mail.defaults do
-  delivery_method :test
-end
-
 class RSpecConstants
 end
 
@@ -74,10 +70,6 @@ RSpec.configure do |config|
   config.color = true
   config.tty = true
   config.formatter = :documentation
-
-  config.before(:each) do
-    Mail::TestMailer.deliveries.clear
-  end
 
   config.around(:all) do |example|
     Sequel.transaction [SEQUEL_DB], rollback: :always do
