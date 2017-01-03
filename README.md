@@ -9,7 +9,7 @@ You will be creating a simple user management API using the tools described belo
 2. PUT /users/:id - Update a user. Add authentication so only the current user can update their own account. There is already a user ability created for this (see `application/lib/abilities.rb`).
 3. PATCH /users/:id/reset_password - Update a user password. It should accept the following fields: new_password, confirm_password. It should also send them an email letting them know their password has been updated.
 
-### Coding Guidelines for each Features
+### Coding guidelines for each feature
 1. All endpoints should have their input and response formats defined using Grape Entities (see URL for library below).
 2. Input data should be validated using Hanami forms.
 3. Each feature must have a spec testing different scenarios and possible failures.  Check that the data is being returned properly.
