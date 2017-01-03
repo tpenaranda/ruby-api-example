@@ -2,9 +2,6 @@ ruby '2.3.3'
 
 source 'http://rubygems.org'
 
-# include sidekiq for background processing
-gem 'sidekiq', '4.2.7'
-
 gem 'unicorn', '5.1.0'
 gem 'thin', '1.7.0'
 gem 'rack', '1.6.4'
@@ -22,7 +19,6 @@ gem 'rack-oauth2', '1.4' # oauth2 server
 gem 'rack-indifferent', '1.1' # makes param keys symbols
 gem 'mysql2', '0.4.5'
 gem 'sequel', '4.40.0'
-gem 'bugsnag', '5.0.1'
 gem 'redis-rack', '1.5.0'
 gem 'mail', '2.6.4'
 gem 'uuidtools', ' 2.1.5'
@@ -34,12 +30,7 @@ gem 'activesupport', '5.0.0'
 gem 'premailer', '1.8.7' # email css inlining
 gem 'nokogiri', '1.6.8' # html dom processing (needed for premailer)
 
-group :production, :staging do
-  gem 'wkhtmltopdf-heroku', '2.12.3.0'
-end
-
 group :development, :test do
-  gem 'wkhtmltopdf-binary-edge', '0.12.3.0'
   gem 'awesome_print', '1.7.0'
   gem 'pry', '0.10.4'
   gem 'ruby-prof', '0.16.2'
