@@ -25,5 +25,18 @@ class Api
       users = Models::User.all()
       present(users, with: API::Entities::User)
     end
+
+    desc 'Create a user'
+    params do
+      requires :first_name, type: String, desc: 'First name'
+      requires :last_name, type: String, desc: 'Last Name'
+      requires :email, type: String, desc: 'Email address'
+      requires :password, type: String, desc: 'Password', coerce_with: Digest::SHA2.method(:hexdigest)
+      optional :born_on, type: Date, desc: 'Date of birth'
+    end
+    post do
+      #Send email confirmation
+      { data: Models::User.create(params) }
+    end
   end
 end

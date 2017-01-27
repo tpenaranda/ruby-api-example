@@ -5,7 +5,7 @@ describe 'POST /api/users/login' do
     @u1 = create :user
   end
 
-  it 'should login an user' do
+  it 'should login a user' do
     post "api/v1.0/users/login", :password => 'secret', :email => @u1.email
     payload = { user_id: @u1.id }
     expect(response_body[:data]).to eq(JWT.encode(payload, HMAC_SECRET, 'HS256'))
@@ -25,5 +25,15 @@ describe 'POST /api/users/login' do
     post "api/v1.0/users/login", :password => 'secret'
     expect(response_body[:error_type]).to eq('validation')
   end
+end
 
+describe 'POST /api/users' do
+  it 'should create a user' do
+    post "api/v1.0/users",
+      :password => 'new_secret',
+      :email => Faker::Internet.email,
+      :first_name => Faker::Name.first_name,
+      :last_name => Faker::Name.last_name
+    expect(response_body[:data][:id]).to eq(Api::Models::User.last.id)
+  end
 end
