@@ -36,7 +36,8 @@ class Api
     end
     post do
       #Send email confirmation
-      { data: Models::User.create(params) }
+      user = Models::User.create(params)
+      present(user, with: API::Entities::User)
     end
 
     desc 'Update a user'
@@ -50,10 +51,11 @@ class Api
         user_to_update = Models::User.find(id: params[:id])
         raise unless user_to_update
         return api_response(error_type: 'forbidden') unless current_user.can?(:edit, user_to_update)
-        Models::User.find(id: params[:id]).update(password: params[:password])
+        user = Models::User.find(id: params[:id]).update(password: params[:password])
       rescue
-        api_response(error_type: 'bad_request')
+        return api_response(error_type: 'bad_request')
       end
+      present(user, with: API::Entities::User)
     end
 
     desc 'Update a user password'
@@ -69,10 +71,9 @@ class Api
       elsif params[:new_password] != params[:confirm_password]
         return api_response(error_type: 'bad_request')
       end
-      Models::User.find(id: params[:id]).update(password: params[:new_password])
-
+      user = Models::User.find(id: params[:id]).update(password: params[:new_password])
+      present(user, with: API::Entities::User)
       #Send password updated email
-
     end
 
   end

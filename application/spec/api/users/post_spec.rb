@@ -34,6 +34,6 @@ describe 'POST /api/users' do
       :email => Faker::Internet.email,
       :first_name => Faker::Name.first_name,
       :last_name => Faker::Name.last_name
-    expect(response_body[:data][:id]).to eq(Api::Models::User.last.id)
+    expect(response_body[:email]).to eq(Api::Models::User.last.email)
   end
 end
