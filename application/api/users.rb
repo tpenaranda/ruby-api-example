@@ -36,10 +36,10 @@ class Api
     end
     post do
       begin
-        #Send email confirmation
         validator = UserCreateValidator.new(params).validate
         if validator.success?
           user = Models::User.create(params)
+          UserMailer.perform_async(user.email, 'You were successfully registered.')
           present(user, with: API::Entities::User)
         else
           { 'errors' => validator.errors }
@@ -86,8 +86,8 @@ class Api
         return api_response(error_type: 'bad_request')
       end
       user = Models::User.find(id: params[:id]).update(password: params[:new_password])
+      UserMailer.perform_async(user.email, 'Password successfully updated.')
       present(user, with: API::Entities::User)
-      #Send password updated email
     end
 
   end
