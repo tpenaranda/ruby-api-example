@@ -7,7 +7,7 @@ class UserMailer
   def perform(email, title)
     Mail.deliver do
       to      email
-      from    'admin@somedomain.ble'
+      from    SUPPORT_EMAIL
       subject title
     end
   end
