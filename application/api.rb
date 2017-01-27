@@ -25,8 +25,9 @@ require 'config/grape'
 
 # require some global libs
 require 'lib/core_ext'
-require 'lib/time_formats'
 require 'lib/io'
+require 'lib/time_formats'
+require 'lib/user_validators'
 
 # load active support helpers
 require 'active_support'
@@ -56,13 +57,8 @@ class Api < Grape::API
   helpers ApiResponse
   include Auth
 
-  before do
-    authenticate!
-  end
-
   Dir['./application/api_entities/**/*.rb'].each { |rb| require rb }
   Dir['./application/api/**/*.rb'].each { |rb| require rb }
 
-  add_swagger_documentation \
-    mount_path: '/docs'
+  add_swagger_documentation mount_path: '/docs'
 end

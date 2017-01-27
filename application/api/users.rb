@@ -35,9 +35,18 @@ class Api
       optional :born_on, type: Date, desc: 'Date of birth'
     end
     post do
-      #Send email confirmation
-      user = Models::User.create(params)
-      present(user, with: API::Entities::User)
+      begin
+        #Send email confirmation
+        validator = UserCreateValidator.new(params).validate
+        if validator.success?
+          user = Models::User.create(params)
+          present(user, with: API::Entities::User)
+        else
+          { 'errors' => validator.errors }
+        end
+      rescue
+        api_response(error_type: 'bad_request')
+      end
     end
 
     desc 'Update a user'
@@ -46,16 +55,21 @@ class Api
       requires :password, type: String, desc: 'Password', coerce_with: Digest::SHA2.method(:hexdigest)
     end
     put ':id' do
-      begin
-        authenticate!
-        user_to_update = Models::User.find(id: params[:id])
-        raise unless user_to_update
-        return api_response(error_type: 'forbidden') unless current_user.can?(:edit, user_to_update)
-        user = Models::User.find(id: params[:id]).update(password: params[:password])
-      rescue
-        return api_response(error_type: 'bad_request')
+      validator = UserUpdateValidator.new(params).validate
+      if validator.success?
+        begin
+          authenticate!
+          user_to_update = Models::User.find(id: params[:id])
+          raise unless user_to_update
+          return api_response(error_type: 'forbidden') unless current_user.can?(:edit, user_to_update)
+          user = Models::User.find(id: params[:id]).update(password: params[:password])
+        rescue
+          return api_response(error_type: 'bad_request')
+        end
+        present(user, with: API::Entities::User)
+      else
+        { 'errors' => validator.errors }
       end
-      present(user, with: API::Entities::User)
     end
 
     desc 'Update a user password'
