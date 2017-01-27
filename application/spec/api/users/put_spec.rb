@@ -8,8 +8,8 @@ describe 'PUT /api/users/:id' do
 
   it 'should not update a not logged in user' do
     put "api/v1.0/users/#{@u1.id}", :password => 'new_secret'
-    expect(last_response.status).to eq(400)
-    expect(response_body[:error_type]).to eq('bad_request')
+    expect(last_response.status).to eq(403)
+    expect(response_body[:error_type]).to eq('forbidden')
   end
 
   it 'should update a user' do
