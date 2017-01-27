@@ -1,5 +1,3 @@
-require 'jwt'
-
 class Api
   resource :users do
     params do
@@ -25,9 +23,7 @@ class Api
     desc 'Return the users list'
     get do
       users = Models::User.all()
-      {
-        data: users
-      }
+      present(users, with: API::Entities::User)
     end
   end
 end
