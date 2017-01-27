@@ -8,7 +8,14 @@ class Api
 
     module HelperMethods
       def authenticate!
-        # Library to authenticate user can go here
+        token = request.headers['Authorization']
+        if token and !current_user
+          token.slice! 'Bearer '
+          decoded_token = JWT.decode token, HMAC_SECRET, true, { :algorithm => 'HS256' }
+          @current_user = Models::User.find(id: decoded_token.first['user_id'])
+        else
+          @current_user = nil
+        end
       end
 
       def current_user

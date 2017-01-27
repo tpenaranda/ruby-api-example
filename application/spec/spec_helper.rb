@@ -6,7 +6,7 @@ require 'faker'
 require 'factory_girl'
 
 # Load up all application files that we'll be testing in the suites
-Dir['./application/models/**/*.rb'].sort.each     { |rb| require rb }
+Dir['./application/models/**/*.rb'].sort.each { |rb| require rb }
 
 FactoryGirl.definition_file_paths = %w{./application/spec/factories}
 FactoryGirl.find_definitions

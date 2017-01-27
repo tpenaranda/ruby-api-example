@@ -38,5 +38,25 @@ class Api
       #Send email confirmation
       { data: Models::User.create(params) }
     end
+
+
+    desc 'Update a user'
+    params do
+      requires :id, type: Integer, desc: 'User ID'
+      requires :password, type: String, desc: 'Password', coerce_with: Digest::SHA2.method(:hexdigest)
+    end
+    put ':id' do
+      begin
+        authenticate!
+        user_to_update = Models::User.find(id: params[:id])
+        #binding.pry
+        raise unless user_to_update
+        return api_response(error_type: 'forbidden') unless current_user.can?(:edit, user_to_update)
+        Models::User.find(id: params[:id]).update(password: params[:password])
+      rescue
+        api_response(error_type: 'bad_request')
+      end
+    end
+
   end
 end
