@@ -39,7 +39,6 @@ class Api
       { data: Models::User.create(params) }
     end
 
-
     desc 'Update a user'
     params do
       requires :id, type: Integer, desc: 'User ID'
@@ -49,13 +48,31 @@ class Api
       begin
         authenticate!
         user_to_update = Models::User.find(id: params[:id])
-        #binding.pry
         raise unless user_to_update
         return api_response(error_type: 'forbidden') unless current_user.can?(:edit, user_to_update)
         Models::User.find(id: params[:id]).update(password: params[:password])
       rescue
         api_response(error_type: 'bad_request')
       end
+    end
+
+    desc 'Update a user password'
+    params do
+      requires :id, type: Integer, desc: 'User ID'
+      requires :new_password, type: String, desc: 'New password', coerce_with: Digest::SHA2.method(:hexdigest)
+      requires :confirm_password, type: String, desc: 'Password confirm', coerce_with: Digest::SHA2.method(:hexdigest)
+    end
+    patch ':id/reset_password' do
+      authenticate!
+      if not current_user or params[:id] != current_user.id
+        return api_response(error_type: 'forbidden')
+      elsif params[:new_password] != params[:confirm_password]
+        return api_response(error_type: 'bad_request')
+      end
+      Models::User.find(id: params[:id]).update(password: params[:new_password])
+
+      #Send password updated email
+
     end
 
   end
