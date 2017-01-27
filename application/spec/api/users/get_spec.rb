@@ -6,7 +6,7 @@ describe 'GET /api/users' do
     @u2 = create :user
   end
 
-  it 'should pull all users' do
+  it 'does pull all users' do
     get "api/v1.0/users"
     body = response_body
     emails = body[:data].map{ |x| x[:email] }
