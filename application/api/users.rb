@@ -1,3 +1,5 @@
+require 'ostruct'
+
 class Api
   resource :users do
     params do
@@ -75,20 +77,29 @@ class Api
     desc 'Update a user password'
     params do
       requires :id, type: Integer, desc: 'User ID'
-      requires :new_password, type: String, desc: 'New password', coerce_with: Digest::SHA2.method(:hexdigest)
-      requires :confirm_password, type: String, desc: 'Password confirm', coerce_with: Digest::SHA2.method(:hexdigest)
+      requires :new_password, type: String, desc: 'New password'
+      requires :new_password_confirmation, type: String, desc: 'Password confirm'
     end
     patch ':id/reset_password' do
-      authenticate!
-      if not current_user or params[:id] != current_user.id
-        return api_response(error_type: 'forbidden')
-      elsif params[:new_password] != params[:confirm_password]
-        return api_response(error_type: 'bad_request')
+      begin
+        authenticate!
+        if current_user and current_user.can?(:edit, Models::User.find(id: params[:id]))
+          validator = UserPasswordUpdateValidator.new(OpenStruct.new(params)).validate
+          if validator.success?
+            new_password_sum = Digest::SHA2.hexdigest(params[:new_password])
+            user = Models::User.find(id: params[:id]).update(password: new_password_sum)
+            UserMailer.perform_async(user.email, 'Password successfully updated.')
+            present(user, with: API::Entities::User)
+          else
+            status 400
+            { 'errors' => validator.errors }
+          end
+        else
+          api_response(error_type: 'forbidden')
+        end
+      rescue
+        api_response(error_type: 'bad_request')
       end
-      user = Models::User.find(id: params[:id]).update(password: params[:new_password])
-      UserMailer.perform_async(user.email, 'Password successfully updated.')
-      present(user, with: API::Entities::User)
     end
-
   end
 end
