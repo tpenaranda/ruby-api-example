@@ -14,7 +14,9 @@ class UserUpdateValidator
   include Hanami::Validations
 
   validations do
-    required('password') { filled? & str? & size?(64) }
+    optional('first_name') { filled? & str? }
+    optional('last_name') { filled? & str? }
+    optional('email') { filled? & str? }
   end
 end
 

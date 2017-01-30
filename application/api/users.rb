@@ -57,7 +57,9 @@ class Api
     desc 'Update a user'
     params do
       requires :id, type: Integer, desc: 'User ID'
-      requires :password, type: String, desc: 'Password', coerce_with: Digest::SHA2.method(:hexdigest)
+      optional :first_name, type: String, desc: 'First name'
+      optional :last_name, type: String, desc: 'Last Name'
+      optional :email, type: String, desc: 'Email address'
     end
     put ':id' do
       validator = UserUpdateValidator.new(params).validate
@@ -67,7 +69,11 @@ class Api
           user_to_update = Models::User.find(id: params[:id])
           raise unless user_to_update
           return api_response(error_type: 'forbidden') unless current_user.can?(:edit, user_to_update)
-          user = Models::User.find(id: params[:id]).update(password: params[:password])
+          user = Models::User.find(id: params[:id])
+          user.first_name = params[:first_name] if params[:first_name]
+          user.last_name = params[:last_name] if params[:last_name]
+          user.email = params[:email] if params[:email]
+          user.save
         rescue
           return api_response(error_type: 'bad_request')
         end
