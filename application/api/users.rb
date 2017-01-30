@@ -12,14 +12,17 @@ class Api
       requires :password, type: String, desc: 'Password', coerce_with: Digest::SHA2.method(:hexdigest)
     end
     post 'login' do
-      user = Models::User.find(email: params[:email])
-
-      return api_response(error_type: 'bad_request') unless user
-      return api_response(error_type: 'forbidden') if user.password != params[:password].strip
-
-      payload = { user_id: user.id }
-
-      { data: JWT.encode(payload, HMAC_SECRET, 'HS256') }
+      begin
+        user = Models::User.find(email: params[:email])
+        if user.password == params[:password].strip
+          payload = { user_id: user.id }
+          { data: JWT.encode(payload, HMAC_SECRET, 'HS256') }
+        else
+          api_response(error_type: 'forbidden')
+        end
+      rescue
+        api_response(error_type: 'bad_request')
+      end
     end
 
     desc 'Return the users list'
