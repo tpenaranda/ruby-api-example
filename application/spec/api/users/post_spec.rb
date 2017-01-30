@@ -29,11 +29,60 @@ end
 
 describe 'POST /api/users' do
   it 'does create a user' do
-    post "api/v1.0/users",
-      :password => 'new_secret',
+    post "api/v1.0/users", {
+        :password => 'new_secret',
+        :email => Faker::Internet.email,
+        :first_name => Faker::Name.first_name,
+        :last_name => Faker::Name.last_name
+    }
+    expect(response_body[:email]).to eq(Api::Models::User.last.email)
+  end
+
+  it 'does not create a user if password is missing' do
+    post "api/v1.0/users", {
       :email => Faker::Internet.email,
       :first_name => Faker::Name.first_name,
       :last_name => Faker::Name.last_name
-    expect(response_body[:email]).to eq(Api::Models::User.last.email)
+    }
+    expect(last_response.status).to eq(400)
+    expect(response_body[:error_type]).to eq('validation')
+    expect(response_body[:errors][:password]).to be_truthy
+    expect(response_body[:errors].size).to be(1)
+  end
+
+  it 'does not create a user if email is missing' do
+    post "api/v1.0/users", {
+      :password => 'new_secret',
+      :first_name => Faker::Name.first_name,
+      :last_name => Faker::Name.last_name
+    }
+    expect(last_response.status).to eq(400)
+    expect(response_body[:error_type]).to eq('validation')
+    expect(response_body[:errors][:email]).to be_truthy
+    expect(response_body[:errors].size).to be(1)
+  end
+
+  it 'does not create a user if first_name is missing' do
+    post "api/v1.0/users", {
+      :password => 'new_secret',
+      :email => Faker::Internet.email,
+      :last_name => Faker::Name.last_name
+    }
+    expect(last_response.status).to eq(400)
+    expect(response_body[:error_type]).to eq('validation')
+    expect(response_body[:errors][:first_name]).to be_truthy
+    expect(response_body[:errors].size).to be(1)
+  end
+
+  it 'does not create a user if last_name is missing' do
+    post "api/v1.0/users", {
+      :password => 'new_secret',
+      :email => Faker::Internet.email,
+      :first_name => Faker::Name.first_name
+    }
+    expect(last_response.status).to eq(400)
+    expect(response_body[:error_type]).to eq('validation')
+    expect(response_body[:errors][:last_name]).to be_truthy
+    expect(response_body[:errors].size).to be(1)
   end
 end
