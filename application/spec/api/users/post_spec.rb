@@ -38,6 +38,17 @@ describe 'POST /api/users' do
     expect(response_body[:email]).to eq(Api::Models::User.last.email)
   end
 
+  it 'does send a email after a new user is created' do
+    Mail::TestMailer.deliveries.clear
+    post "api/v1.0/users", {
+        :password => 'new_secret',
+        :email => Faker::Internet.email,
+        :first_name => Faker::Name.first_name,
+        :last_name => Faker::Name.last_name
+    }
+    expect(Mail::TestMailer.deliveries.size).to eq(1)
+  end
+
   it 'does not create a user if password is missing' do
     post "api/v1.0/users", {
       :email => Faker::Internet.email,

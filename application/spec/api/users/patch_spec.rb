@@ -19,6 +19,13 @@ describe 'PATCH /api/users/:id/reset_password' do
     expect(@u1.password).to eq(Digest::SHA2.hexdigest('new_secret'))
   end
 
+  it 'does send a confirmation email after a user password is updated' do
+    Mail::TestMailer.deliveries.clear
+    login_as(@u1)
+    patch "api/v1.0/users/#{@u1.id}/reset_password", :new_password => 'new_secret', :new_password_confirmation => 'new_secret'
+    expect(Mail::TestMailer.deliveries.size).to eq(1)
+  end
+
   it 'does not update if password confirm is wrong' do
     login_as(@u1)
     patch "api/v1.0/users/#{@u1.id}/reset_password", :new_password => 'new_secret', :new_password_confirmation => 'new_wrong_secret'

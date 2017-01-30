@@ -2,14 +2,19 @@ require 'rspec/core'
 require 'rack/test'
 ENV['RACK_ENV'] = 'test'
 require './application/api'
-require 'faker'
 require 'factory_girl'
+require 'faker'
+require 'sucker_punch/testing/inline'
 
 # Load up all application files that we'll be testing in the suites
 Dir['./application/models/**/*.rb'].sort.each { |rb| require rb }
 
 FactoryGirl.definition_file_paths = %w{./application/spec/factories}
 FactoryGirl.find_definitions
+
+Mail.defaults do
+  delivery_method :test
+end
 
 # Factory Girl is expecting ActiveRecord
 class Sequel::Model
